@@ -1,0 +1,182 @@
+// Project Structure
+// interview-app/
+// ├── server.js
+// ├── package.json
+// ├── database.js
+// ├── public/
+// │   ├── index.html
+// │   ├── style.css
+// │   └── app.js
+// └── views/
+//     └── result.html
+
+
+// =============================
+// FILE: package.json
+// =============================
+{
+  "name": "interview-app",
+  "version": "1.0.0",
+  "description": "Sistem Penilaian Hasil Wawancara",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  }
+}
+
+
+// =============================
+// FILE: database.js
+// =============================
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./interview.db');
+
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS interviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        communication INTEGER,
+        attitude INTEGER,
+        problem_solving INTEGER,
+        teamwork INTEGER,
+        notes TEXT,
+        final_score INTEGER
+    )`);
+});
+
+module.exports = db;
+
+
+// =============================
+// FILE: server.js
+// =============================
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const db = require('./database');
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+app.post('/submit', (req, res) => {
+    const { name, communication, attitude, problem_solving, teamwork, notes } = req.body;
+    const final_score = parseInt(communication) + parseInt(attitude) + parseInt(problem_solving) + parseInt(teamwork);
+
+    db.run(`INSERT INTO interviews (name, communication, attitude, problem_solving, teamwork, notes, final_score) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [name, communication, attitude, problem_solving, teamwork, notes, final_score],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ message: "Data Saved", id: this.lastID, final_score });
+        }
+    );
+});
+
+app.get('/results', (req, res) => {
+    db.all(`SELECT * FROM interviews ORDER BY final_score DESC`, [], (err, rows) => {
+        if (err) return res.status(500).send(err.message);
+        res.json(rows);
+    });
+});
+
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+
+
+// =============================
+// FILE: public/index.html
+// =============================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistem Penilaian Interview</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Form Penilaian Interview</h1>
+
+    <form id="interviewForm">
+        <label>Nama Kandidat:</label>
+        <input type="text" id="name" required>
+
+        <label>Komunikasi (0–25):</label>
+        <input type="number" id="communication" min="0" max="25" required>
+
+        <label>Sikap (0–25):</label>
+        <input type="number" id="attitude" min="0" max="25" required>
+
+        <label>Problem Solving (0–25):</label>
+        <input type="number" id="problem_solving" min="0" max="25" required>
+
+        <label>Teamwork (0–25):</label>
+        <input type="number" id="teamwork" min="0" max="25" required>
+
+        <label>Catatan Tambahan:</label>
+        <textarea id="notes"></textarea>
+
+        <button type="submit">Simpan Penilaian</button>
+    </form>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+// =============================
+// FILE: public/style.css
+// =============================
+body {
+    font-family: Arial;
+    width: 400px;
+    margin: 40px auto;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+input, textarea {
+    padding: 8px;
+}
+button {
+    padding: 10px;
+    background: black;
+    color: white;
+    cursor: pointer;
+}
+
+
+// =============================
+// FILE: public/app.js
+// =============================
+
+const form = document.getElementById('interviewForm');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const data = {
+        name: document.getElementById('name').value,
+        communication: document.getElementById('communication').value,
+        attitude: document.getElementById('attitude').value,
+        problem_solving: document.getElementById('problem_solving').value,
+        teamwork: document.getElementById('teamwork').value,
+        notes: document.getElementById('notes').value
+    };
+
+    const response = await fetch('/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    alert('Data Berhasil Disimpan! Skor Akhir: ' + result.final_score);
+});

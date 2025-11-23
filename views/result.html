@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hasil Penilaian Kandidat</title>
+<link rel="stylesheet" href="../public/style.css">
+<style>
+table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 20px;
+}
+th, td {
+padding: 10px;
+border: 1px solid #ccc;
+text-align: left;
+}
+th {
+background: #f5f5f5;
+}
+</style>
+</head>
+<body>
+<h1>Statistik Top Skor Per Divisi</h1>
+<div id="stats"></div>
+
+<script>
+async function loadResults() {
+	const res = await fetch('/results');
+	const data = await res.json();
+	const statsDiv = document.getElementById('stats');
+	statsDiv.innerHTML = '';
+	data.forEach(divisi => {
+		const section = document.createElement('section');
+		section.innerHTML = `<h2>${divisi.division}</h2>`;
+		const table = document.createElement('table');
+		table.innerHTML = `<thead><tr>
+			<th>Nama</th>
+			<th>Komunikasi</th>
+			<th>Sikap</th>
+			<th>Problem Solving</th>
+			<th>Teamwork</th>
+			<th>Skor Akhir</th>
+			<th>Catatan</th>
+		</tr></thead><tbody></tbody>`;
+		const tbody = table.querySelector('tbody');
+		divisi.candidates.forEach(row => {
+			const tr = document.createElement('tr');
+			tr.innerHTML = `
+				<td>${row.name}</td>
+				<td>${row.communication}</td>
+				<td>${row.attitude}</td>
+				<td>${row.problem_solving}</td>
+				<td>${row.teamwork}</td>
+				<td><b>${row.final_score}</b></td>
+				<td>${row.notes || '-'}</td>
+			`;
+			tbody.appendChild(tr);
+		});
+		table.appendChild(tbody);
+		section.appendChild(table);
+		statsDiv.appendChild(section);
+	});
+}
+loadResults();
+</script>
+</body>
+</html>
