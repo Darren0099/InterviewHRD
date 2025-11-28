@@ -1,7 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const db = require('./database');
+const Database = require('better-sqlite3');
+const path = require('path');
+const db = new Database(path.join(__dirname, 'interview.db'));
+
 
 const app = express();
 app.use(cors());
@@ -16,7 +19,7 @@ app.get('/results-page', (req, res) => {
 // Hapus data
 app.delete('/delete/:id', (req, res) => {
     const id = req.params.id;
-    
+
     const stmt = db.prepare('DELETE FROM interviews WHERE id = ?');
     stmt.run(id);
 
@@ -67,7 +70,6 @@ app.get('/results', (req, res) => {
         `);
 
         const rows = stmt.all(div, divisionLimits[div]);
-
         results.push({ division: div, candidates: rows });
     });
 
