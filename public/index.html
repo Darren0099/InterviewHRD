@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div style="position:absolute;top:10px;left:10px;display:flex;gap:1rem;">
+      <button id="deleteAllBtn" class="btn-danger" style="padding:0.5rem 1rem;font-size:1rem;font-weight:600;">Hapus Semua Data</button>
+      <button id="downloadPdfBtn" class="btn-secondary" style="padding:0.5rem 1rem;font-size:1rem;font-weight:600;">Unduh PDF</button>
+    </div>
     <div style="display:flex;flex-direction:column;align-items:center;">
       <button id="showFormBtn" class="btn-primary" style="margin-bottom:2rem;margin-top:1.5rem;font-size:1.3rem;padding:1rem 2.5rem;font-weight:700;">+ Tambah Data Kandidat</button>
       <h1 style="font-size:2.5rem;font-weight:700;margin-bottom:1rem;text-align:center;">Statistik Top Skor Per Divisi</h1>
@@ -79,6 +83,7 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="app.js"></script>
 </body>
 </html>
