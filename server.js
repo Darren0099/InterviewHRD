@@ -196,3 +196,12 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
 
+app.get('/', (req, res) => {
+    res.status(200).send('Interview App is running');
+});
+app.use((err, req, res, next) => {
+    console.error('EXPRESS ERROR:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+});
+
+
