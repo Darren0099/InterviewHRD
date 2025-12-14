@@ -2,8 +2,6 @@
 const showFormBtn = document.getElementById('showFormBtn');
 const formModal = document.getElementById('formModal');
 const closeFormBtn = document.getElementById('closeFormBtn');
-const deleteAllBtn = document.getElementById('deleteAllBtn');
-const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
 showFormBtn.addEventListener('click', () => {
 	formModal.style.display = 'flex';
@@ -29,23 +27,13 @@ document.getElementById('interviewForm').addEventListener('submit', async functi
 		body: JSON.stringify({ hrd_name, name, division, communication, attitude, problem_solving, teamwork, notes })
 	});
 	const data = await res.json();
-	if (data.message === "Data Saved" || data.message === "Data Updated") {
-		Swal.fire({
-			icon: 'success',
-			title: 'Berhasil!',
-			text: data.message === "Data Saved" ? 'Data berhasil dimasukkan!' : 'Data berhasil diperbarui!',
-			timer: 2000,
-			showConfirmButton: false
-		});
+	if (data.message === "Data Saved") {
+		alert('Penilaian berhasil disimpan!');
 		document.getElementById('interviewForm').reset();
 		formModal.style.display = 'none';
 		loadResults();
 	} else {
-		Swal.fire({
-			icon: 'error',
-			title: 'Gagal!',
-			text: 'Gagal menyimpan data: ' + (data.error || 'Unknown error')
-		});
+		alert('Gagal menyimpan data: ' + (data.error || 'Unknown error'));
 	}
 });
 
@@ -190,66 +178,16 @@ async function loadResults() {
 			setTimeout(() => {
 				document.querySelectorAll('.delete-btn').forEach(btn => {
 					btn.onclick = async function() {
-						const id = this.getAttribute('data-id');
-						Swal.fire({
-							title: 'Yakin ingin menghapus?',
-							text: "Data yang dihapus tidak dapat dikembalikan!",
-							icon: 'warning',
-							showCancelButton: true,
-							confirmButtonColor: '#d33',
-							cancelButtonColor: '#3085d6',
-							confirmButtonText: 'Ya, Hapus!',
-							cancelButtonText: 'Batal'
-						}).then(async (result) => {
-							if (result.isConfirmed) {
-								await fetch(`/delete/${id}`, { method: 'DELETE' });
-								Swal.fire({
-									icon: 'success',
-									title: 'Dihapus!',
-									text: 'Data berhasil dihapus.',
-									timer: 2000,
-									showConfirmButton: false
-								});
-								modal.style.display = 'none';
-								loadResults();
-							}
-						});
+						if (confirm('Yakin ingin menghapus data ini?')) {
+							const id = this.getAttribute('data-id');
+							await fetch(`/delete/${id}`, { method: 'DELETE' });
+							modal.style.display = 'none';
+							loadResults();
+						}
 					};
 				});
 			}, 300);
 		});
 	});
 }
-
-// Delete all data
-deleteAllBtn.addEventListener('click', async () => {
-	Swal.fire({
-		title: 'Yakin ingin menghapus semua data?',
-		text: "Semua data akan dihapus dan tidak dapat dikembalikan!",
-		icon: 'warning',
-		showCancelButton: true,
-		confirmButtonColor: '#d33',
-		cancelButtonColor: '#3085d6',
-		confirmButtonText: 'Ya, Hapus Semua!',
-		cancelButtonText: 'Batal'
-	}).then(async (result) => {
-		if (result.isConfirmed) {
-			await fetch('/delete-all', { method: 'DELETE' });
-			Swal.fire({
-				icon: 'success',
-				title: 'Dihapus!',
-				text: 'Semua data berhasil dihapus.',
-				timer: 2000,
-				showConfirmButton: false
-			});
-			loadResults();
-		}
-	});
-});
-
-// Download PDF
-downloadPdfBtn.addEventListener('click', () => {
-	window.open('/download-pdf', '_blank');
-});
-
 loadResults();
