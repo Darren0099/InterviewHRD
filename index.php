@@ -306,6 +306,56 @@ document.addEventListener("DOMContentLoaded", function() {
     );
 });
 </script>
+<style>
+  /* =======================
+   FOOTER
+======================= */
+
+.footer{
+    margin-top:60px;
+    background:#ffffff;
+    border-top:1px solid #e5e7eb;
+    padding:25px 0;
+    color:#6b7280;
+    box-shadow:0 -3px 15px rgba(0,0,0,.03);
+}
+
+.footer h6{
+    color:#111827;
+    font-weight:700;
+}
+
+.footer p{
+    margin-bottom:8px;
+    font-size:14px;
+}
+
+.footer small{
+    font-size:13px;
+    line-height:22px;
+}
+</style>
+<footer class="footer mt-5">
+    <div class="container text-center">
+
+        <h6 class="mb-2 fw-bold">
+            Kandidat Youth Ranger Indonesia
+        </h6>
+
+        <p class="mb-1">
+            Sistem Penilaian Interview Human Resource Development (HRD)
+        </p>
+
+        <small>
+            © 2026 Youth Ranger Indonesia District Sumatera 2
+            <br>
+            Developed by Tim Human Resource District Sumatera 2
+            <br>
+            Under the supervision of <b>Youth Ranger Indonesia Pusat</b>
+        </small>
+
+    </div>
+</footer>
 </body>
 </html>
 
