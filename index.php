@@ -72,6 +72,8 @@ $i = 0;
 <meta charset="UTF-8">
 <title>Dashboard Kandidat YRI</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Link Bootstrap Icons untuk icon tombol panduan -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="assets/css/style.css">
@@ -94,7 +96,14 @@ const REGIONAL_AKTIF = "<?= $regionalAktif ?>";
 <body>
 
 <nav class="navbar navbar-expand-lg bg-white shadow-sm px-4">
-  <span class="navbar-brand fw-bold">Kandidat Youth Ranger Indonesia</span>
+  <div class="d-flex align-items-center gap-2">
+    <span class="navbar-brand fw-bold mb-0">Kandidat Youth Ranger Indonesia</span>
+    <!-- TOMBOL PANDUAN -->
+    <button class="btn btn-info text-white btn-sm d-flex align-items-center gap-1" onclick="panduanPenilaian()">
+       <i class="bi bi-info-circle"></i> Panduan
+    </button>
+  </div>
+  
   <form class="d-flex ms-3" method="get">
     <input type="hidden" name="regional" value="<?= $regionalAktif ?>">
     <input class="form-control" name="search" placeholder="Cari kandidat" value="<?= htmlspecialchars($search) ?>">
@@ -161,7 +170,7 @@ const REGIONAL_AKTIF = "<?= $regionalAktif ?>";
             <h5 class="fw-bold text-dark m-0 pe-2"><?= $div ?></h5>
             <span class="badge bg-dark">TOP <?= $sd['top'] >= $limit ? '✓' : '✕' ?></span>
           </div>
-          
+           
           <div class="mt-3">
             <small class="d-block text-secondary fw-semibold"><?= $sd['jml'] ?> Orang</small>
             <div class="progress my-1" style="height: 6px;"><div class="progress-bar bg-dark" style="width:<?= $persen ?>%"></div></div>
@@ -305,12 +314,56 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     );
 });
+
+// FUNGSI POP UP PANDUAN LANGSUNG DI SINI
+function panduanPenilaian(){
+    Swal.fire({
+        title: 'Panduan Penilaian Interview',
+        width: 850,
+        confirmButtonText: 'Saya Mengerti',
+        html: `
+        <div style="text-align:left; font-size: 0.95rem;">
+            <h6 class="fw-bold text-dark">Penilaian terdiri dari 4 aspek:</h6>
+            <table class="table table-bordered sm-table">
+                <thead class="table-light">
+                    <tr><th>Aspek</th><th>Maksimal</th><th>Kriteria Penilaian</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><b>Kompetensi Teknis</b></td><td>25</td><td>Kemampuan divisi, pengalaman, pemahaman tugas</td></tr>
+                    <tr><td><b>Komunikasi</b></td><td>25</td><td>Cara menyampaikan ide, percaya diri, cara diskusi</td></tr>
+                    <tr><td><b>Sikap & Kepribadian</b></td><td>25</td><td>Etika, tanggung jawab, kerja sama, kedisiplinan</td></tr>
+                    <tr><td><b>Motivasi & Komitmen</b></td><td>25</td><td>Alasan bergabung, kesiapan berkontribusi aktif</td></tr>
+                </tbody>
+            </table>
+            <br>
+            <h6 class="fw-bold text-dark">Interpretasi Total Nilai:</h6>
+            <table class="table table-striped sm-table">
+                <thead>
+                    <tr><th>Total Skor</th><th>Keterangan Status</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>90 - 100</td><td>⭐ Sangat Direkomendasikan</td></tr>
+                    <tr><td>80 - 89</td><td>✅ Direkomendasikan</td></tr>
+                    <tr><td>70 - 79</td><td>🟡 Dipertimbangkan</td></tr>
+                    <tr><td>60 - 69</td><td>🟠 Kurang Direkomendasikan</td></tr>
+                    <tr><td>&lt; 60</td><td>🔴 Tidak Direkomendasikan</td></tr>
+                </tbody>
+            </table>
+        </div>
+        `
+    });
+}
 </script>
+
 <style>
-  /* =======================
+/* Style Tambahan untuk Tabel Panduan */
+.sm-table th, .sm-table td {
+    padding: 8px !important;
+    font-size: 13px;
+}
+/* =======================
    FOOTER
 ======================= */
-
 .footer{
     margin-top:60px;
     background:#ffffff;
@@ -319,17 +372,14 @@ document.addEventListener("DOMContentLoaded", function() {
     color:#6b7280;
     box-shadow:0 -3px 15px rgba(0,0,0,.03);
 }
-
 .footer h6{
     color:#111827;
     font-weight:700;
 }
-
 .footer p{
     margin-bottom:8px;
     font-size:14px;
 }
-
 .footer small{
     font-size:13px;
     line-height:22px;
@@ -337,23 +387,13 @@ document.addEventListener("DOMContentLoaded", function() {
 </style>
 <footer class="footer mt-5">
     <div class="container text-center">
-
-        <h6 class="mb-2 fw-bold">
-            Kandidat Youth Ranger Indonesia
-        </h6>
-
-        <p class="mb-1">
-            Sistem Penilaian Interview Human Resource Development (HRD)
-        </p>
-
+        <h6 class="mb-2 fw-bold">Kandidat Youth Ranger Indonesia</h6>
+        <p class="mb-1">Sistem Penilaian Interview Human Resource Development (HRD)</p>
         <small>
-            © 2026 Youth Ranger Indonesia District Sumatera 2
-            <br>
-            Developed by Tim Human Resource District Sumatera 2
-            <br>
+            © 2026 Youth Ranger Indonesia District Sumatera 2<br>
+            Developed by Tim Human Resource District Sumatera 2<br>
             Under the supervision of <b>Youth Ranger Indonesia Pusat</b>
         </small>
-
     </div>
 </footer>
 </body>
