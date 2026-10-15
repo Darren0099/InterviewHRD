@@ -1,0 +1,12 @@
+/vendor
+/node_modules
+.env
+.env.backup
+/storage/*.key
+/storage/logs/*.log
+/storage/framework/views/*.php
+/storage/framework/sessions/*
+/storage/framework/cache/data/*
+
+# tetap simpan folder kosong
+!.gitkeep

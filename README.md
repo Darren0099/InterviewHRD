@@ -1,257 +1,67 @@
-# 📋 Interview HRD Dashboard
+# Interview HRD — Laravel Edition
 
-Sistem informasi berbasis **PHP Native + MySQL** untuk membantu tim **Human Resource Development (HRD)** dalam melakukan proses wawancara, penilaian, serta menentukan kandidat terbaik berdasarkan divisi pada proses rekrutmen **Youth Ranger Indonesia**.
+Versi Laravel dari **InterviewHRD** (Youth Ranger Indonesia), dengan tampilan dashboard modern bergaya *gamification* (tema ungu, ikon SVG), ramah HP, dan export **Excel + PDF** yang memuat waktu unduh.
 
----
+## Persyaratan
+- PHP **8.2+** (aktifkan ekstensi `gd`, `zip`, `mbstring`, `xml`, `fileinfo`, `pdo_mysql` di `php.ini` XAMPP)
+- Composer 2
+- MySQL / MariaDB (XAMPP)
 
-## ✨ Features
-
-- 📊 Dashboard statistik kandidat
-- 🏆 TOP kandidat setiap divisi
-- 📝 CRUD data kandidat
-- 🌍 Filter berdasarkan regional
-- 🔍 Pencarian kandidat
-- 📈 Progress jumlah pendaftar setiap divisi
-- 📄 Export data ke Excel
-- 📑 Export data ke PDF
-- 🗑️ Hapus seluruh data per regional
-- 💬 SweetAlert untuk seluruh aksi CRUD
-- 🎨 Modern Dashboard UI (Bootstrap 5)
-
----
-
-## 🏢 Divisi yang Didukung
-
-| Divisi | Kuota TOP |
-|---------|----------:|
-| Graphic Design | 4 |
-| Content Creator | 3 |
-| Finance | 4 |
-| Project Management | 7 |
-| Human Resource | 7 |
-| Public Relation | 7 |
-| Secretary | 2 |
-| Vice Leader | 5 |
-| Leader | 5 |
-| Social Media Management | 1 |
-
----
-
-## 🌍 Regional
-
-- Sumatera Selatan
-- Lampung
-- Jambi
-- Bengkulu
-- Bangka Belitung
-
----
-
-# 🛠️ Tech Stack
-
-- PHP Native
-- MySQL
-- Bootstrap 5
-- JavaScript
-- SweetAlert2
-- Chart.js
-- DOMPDF
-- XAMPP
-
----
-
-# 📂 Struktur Folder
-
-```text
-HRD/
-│
-├── assets/
-│   ├── css/
-│   ├── js/
-│   └── img/
-│
-├── database/
-│   └── db_hrd.sql
-│
-├── index.php
-├── koneksi.php
-├── simpan.php
-├── update.php
-├── hapus.php
-├── get_data.php
-├── top_divisi.php
-├── hapus_regional.php
-├── export_excel.php
-├── export_pdf.php
-│
-└── README.md
-```
-
----
-
-# 🗄️ Database
-
-Import file berikut:
-
-```
-database/db_hrd.sql
-```
-
-Database yang digunakan:
-
-```
-db_hrd
-```
-
----
-
-# ⚙️ Instalasi
-
-## 1. Clone Repository
-
+## Cara menjalankan
 ```bash
-git clone https://github.com/Darren0099/InterviewHRD.git
+cd InterviewHRD-Laravel
+composer install
+copy .env.example .env          # Linux/Mac: cp .env.example .env
+php artisan key:generate
 ```
-
----
-
-## 2. Masuk Folder Project
-
+1. Buat database kosong `db_hrd` di phpMyAdmin (atau pakai database lama yang sudah ada).
+2. Cek `.env` bagian `DB_*` (default XAMPP: user `root`, password kosong).
+3. Jalankan:
 ```bash
-cd InterviewHRD
+php artisan migrate
+php artisan serve --host=0.0.0.0 --port=8000
 ```
+Buka http://localhost:8000
 
----
+### Membuka dari HP (satu Wi-Fi)
+Cek IP laptop (`ipconfig` / `ifconfig`), lalu buka `http://IP-LAPTOP:8000` di browser HP.
 
-## 3. Pindahkan ke
+### Data lama
+- Sudah punya tabel `penilaian` dari `db_hrd.sql`? Import dulu SQL-nya, lalu `php artisan migrate`.
+  Data **tidak dihapus**; migrasi hanya menambah kolom `created_at` / `updated_at` bila belum ada.
+  (Tabel lama diasumsikan punya kolom `id` sebagai primary key.)
+- Ingin coba dengan data contoh: `php artisan db:seed --class=DemoSeeder`
 
-```
-xampp/htdocs/
-```
+## Pemetaan file lama → Laravel
+| PHP lama | Laravel |
+|---|---|
+| `index.php` | `DashboardController` + `resources/views/dashboard.blade.php`, `kandidat.blade.php` |
+| `koneksi.php` | `.env` (`DB_*`) |
+| `simpan.php` | `PenilaianController@store` (`POST /penilaian`) |
+| `update.php` | `PenilaianController@update` (`PUT /penilaian/{id}`) |
+| `hapus.php` | `PenilaianController@destroy` (`DELETE /penilaian/{id}`) |
+| `hapus_regional.php` | `PenilaianController@destroyRegional` (`DELETE /regional`) |
+| `top_divisi.php` | `PenilaianController@top` (`GET /top`) |
+| `get_data.php` | `KandidatController` (pencarian & filter di halaman Kandidat) |
+| `export_excel.php` | `ExportController@excel` (`.xlsx`, PhpSpreadsheet) |
+| `export_pdf.php` | `ExportController@pdf` (DomPDF) |
 
-sehingga menjadi
+## Fitur baru
+- Level & XP, misi rekrutmen, badge pencapaian, leaderboard HRD, konfetti saat kandidat masuk TOP
+- Navigasi bawah di HP, teks besar, kartu kandidat (bukan tabel kecil), form dengan slider
+- Export Excel/PDF per regional atau **semua regional**, berisi *waktu unduh*, *waktu input*, peringkat, dan status TOP
+- Zona waktu `Asia/Jakarta` (ubah `APP_TIMEZONE` di `.env`)
 
-```
-xampp/
-└── htdocs/
-    └── HRD/
-```
+## Kuota TOP
+Diatur di `config/hrd.php` (mengikuti kode `top_divisi.php`). Catatan: README lama menulis Secretary = 2 dan
+Social Media Management = 1, tetapi kode lama memakai 5 dan 4 — versi ini mengikuti **kode**. Silakan ubah bila perlu.
 
----
+## Catatan keamanan
+Seperti versi lama, belum ada login. Jika aplikasi dipasang di internet, tambahkan autentikasi (mis. Laravel Breeze) lebih dulu.
 
-## 4. Import Database
+## Login HR
+Isi `HRD_USERNAME` dan `HRD_PASSWORD` di `.env`. Jika `HRD_PASSWORD` dikosongkan, login nonaktif (hanya untuk lokal).
+Di server production, aplikasi menolak jalan bila `HRD_PASSWORD` kosong.
 
-Buka phpMyAdmin
-
-```
-http://localhost/phpmyadmin
-```
-
-Import
-
-```
-database/db_hrd.sql
-```
-
----
-
-## 5. Atur Koneksi
-
-Buka
-
-```
-koneksi.php
-```
-
-Sesuaikan
-
-```php
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "db_hrd";
-```
-
----
-
-## 6. Jalankan
-
-```
-http://localhost/HRD/
-```
-
----
-
-# 📊 Dashboard
-
-Dashboard menampilkan
-
-- Total Pendaftar
-- Total Kandidat TOP
-- Card tiap divisi
-- Progress pendaftar
-- Ranking kandidat
-- Statistik
-
----
-
-# 📝 Penilaian Kandidat
-
-Setiap kandidat dinilai berdasarkan empat aspek.
-
-| Aspek | Maksimal |
-|--------|----------|
-| Teknis | 25 |
-| Komunikasi | 25 |
-| Sikap | 25 |
-| Motivasi | 25 |
-
-Total maksimum
-
-```
-100
-```
-
----
-
-# 📄 Export
-
-Data dapat diekspor menjadi
-
-- Microsoft Excel (.xls)
-- PDF
-
-berdasarkan regional yang dipilih.
-
----
-
-# 🚀 Roadmap
-
-- [x] CRUD Kandidat
-- [x] Dashboard HRD
-- [x] Search Kandidat
-- [x] Export Excel
-- [x] Export PDF
-- [x] Popup TOP Divisi
-- [ ] Login Admin
-- [ ] Login HRD
-- [ ] Multi Batch Recruitment
-- [ ] Grafik Statistik
-- [ ] Riwayat Penilaian
-- [ ] Multi User
-
----
-
-# 👨‍💻 Developer
-
-**Al-man Raffli Saputra**
-
-GitHub
-
-https://github.com/Darren0099
-
----
-
-# 📜 License
-
-Project ini dibuat untuk kebutuhan proses seleksi **Youth Ranger Indonesia** sebagai sistem pendukung penilaian kandidat oleh tim Human Resource.
+## Deploy gratis
+Lihat `PANDUAN_DEPLOY.md` (GitHub + Wasmer).

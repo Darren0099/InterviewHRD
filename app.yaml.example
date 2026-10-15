@@ -1,0 +1,11 @@
+# OPSIONAL - hanya jika deploy lewat CLI. Ganti nama jadi app.yaml dan ubah owner/name.
+kind: wasmer.io/App.v0
+name: interview-hrd
+owner: USERNAME-WASMER-ANDA
+package: .
+capabilities:
+  database:
+    engine: mysql
+locality:
+  regions:
+    - us-losa1
